@@ -1,0 +1,8 @@
+# LLM and embeddings (OpenAI-compatible APIs)
+openai>=1.0.0
+
+# Vector DB and RAG
+weaviate-client>=4.0.0
+
+# Config (env loading)
+python-dotenv>=1.0.0

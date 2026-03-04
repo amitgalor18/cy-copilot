@@ -1,0 +1,1 @@
+At 14:00 the SIEM alerted on multiple failed login attempts to the OTA backend from IP 10.0.5.12. The service account svc_ota_prod was implicated. Shortly after we saw successful auth and an attempt to escalate privileges. Infotainment and telematics are in scope. Request immediate containment and runbook-based response.
