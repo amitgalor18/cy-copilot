@@ -23,3 +23,8 @@ EMBED_MODEL = os.getenv("EMBED_MODEL", "bge-m3")  # Common embedding model
 WEAVIATE_URL = (os.getenv("WEAVIATE_URL") or "").strip() or None
 WEAVIATE_API_KEY = os.getenv("WEAVIATE_API_KEY", None)  # For Weaviate Cloud
 WEAVIATE_COLLECTION = "ResolvedTicket"
+
+# Input validation thresholds
+MIN_REPORT_LENGTH = 50       # characters — a meaningful report needs at least ~1 sentence
+MAX_REPORT_LENGTH = 50_000   # characters — guard against absurdly large payloads
+MIN_ALPHA_RATIO = 0.15       # at least 15 % of characters must be letters (rejects pure hex/binary)

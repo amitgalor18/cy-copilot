@@ -24,11 +24,48 @@ from weaviate_rag import (
 )
 
 
+class ReportValidationError(Exception):
+    """Raised when the raw report fails pre-flight input checks."""
+
+
+def validate_report(text: str) -> str:
+    """Validate raw report text. Returns the (possibly truncated) text or raises ReportValidationError."""
+    stripped = text.strip()
+
+    if len(stripped) < config.MIN_REPORT_LENGTH:
+        raise ReportValidationError(
+            f"Report is too short ({len(stripped)} characters). "
+            f"Please provide at least {config.MIN_REPORT_LENGTH} characters "
+            "of incident details for the copilot to produce a useful analysis."
+        )
+
+    if len(stripped) > config.MAX_REPORT_LENGTH:
+        raise ReportValidationError(
+            f"Report is too long ({len(stripped):,} characters, "
+            f"limit is {config.MAX_REPORT_LENGTH:,}). "
+            "Please shorten the report or split it into separate incidents."
+        )
+
+    alpha_count = sum(c.isalpha() for c in stripped)
+    if len(stripped) > 0 and (alpha_count / len(stripped)) < config.MIN_ALPHA_RATIO:
+        raise ReportValidationError(
+            "Report does not contain enough readable text "
+            f"(only {alpha_count} alphabetic characters out of {len(stripped)}). "
+            "The copilot needs a human-readable incident description, "
+            "not raw log dumps or binary data."
+        )
+
+    return stripped
+
+
 def run_copilot(raw_report: str) -> dict:
     """
     Run the full copilot pipeline on a raw incident report.
     Returns dict with keys: summary_text, mitigation_text, similar_incidents_text, structured (stage 1 JSON).
+    Raises ReportValidationError if the input is too short, too long, or unreadable.
     """
+    raw_report = validate_report(raw_report)
+
     # Stage 1: Summarize and extract
     structured = summarize_incident(raw_report)
     summary_text = structured.get("summary", "")
@@ -92,7 +129,11 @@ def main() -> None:
         print("Provide report text as argument or use --file path/to/report.txt", file=sys.stderr)
         sys.exit(1)
 
-    result = run_copilot(raw_report)
+    try:
+        result = run_copilot(raw_report)
+    except ReportValidationError as e:
+        print(f"\n[Copilot] Unable to process this report:\n  {e}\n", file=sys.stderr)
+        sys.exit(1)
 
     print("\n--- EXECUTIVE SUMMARY ---\n")
     print(result["summary_text"])

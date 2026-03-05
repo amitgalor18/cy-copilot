@@ -19,6 +19,12 @@ Extract and return a JSON object with these exact keys:
 - extracted_keywords: list of strings (IPs, hostnames, user names, IDs, CVEs, or key terms useful for searching similar incidents)
 - summary: string (a clear 2–4 sentence executive summary for the user)
 
+HANDLING INCOMPLETE OR AMBIGUOUS REPORTS:
+- If the report does not contain enough information to determine a field, use null for string fields and [] for list fields.
+- If the incident type or criticality cannot be confidently determined, use "other" or "medium" respectively, and state what was unclear in the summary field.
+- Do NOT guess or hallucinate values that are not supported by the report text.
+- In the summary field, explicitly note any important information that was missing or ambiguous (e.g. "The report did not specify the source system" or "Criticality could not be determined from the available details").
+
 Return only the JSON object, no other text."""
 
 MITIGATION_SYSTEM = """You are an automotive cybersecurity response specialist. You produce mitigation and response plans that follow the company runbook and are tailored to the specific incident."""
