@@ -6,6 +6,10 @@ A prototype copilot that:
 2. **Suggests mitigation** using a mock runbook and a second LLM call.
 3. **Retrieves similar incidents** from a Weaviate knowledge base using hybrid (vector + keyword) search.
 
+## Architecture
+
+![Project flowchart](flowchart.png)
+
 ## Setup
 
 ### 1. Python environment
